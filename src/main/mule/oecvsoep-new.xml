@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e63c0982-826c-4ae9-9815-09501e5b8a36" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="oecvsoep-newFlow" doc:id="a8f5a686-6b3e-4968-bf53-345145fe1575" >
+		<http:listener doc:name="Listener" doc:id="6bb9a60b-9a1d-4cab-9bfd-4bb9813b4e80" config-ref="HTTP_Listener_config" path="/test"/>
+		<logger level="INFO" doc:name="Logger" doc:id="70610ae9-9eaf-41f3-b203-f0e699323890" message="start flow"/>
+		<flow-ref doc:name="Flow Reference" doc:id="99198146-1a2e-49db-9288-22512ce69293" name="oecvsoep-newFlow1"/>
+		<flow-ref doc:name="Flow Reference" doc:id="ce0a9e32-7de6-46fc-a8d9-bdba9c44b87d" name="oecvsoep-newFlow2"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b1c9bcf7-6d9f-43ed-be37-050265cfc955" message="end flow"/>
+	</flow>
+	<flow name="oecvsoep-newFlow1" doc:id="f078fb70-bf79-4dfd-a96b-4aac196b23b7" >
+		<logger level="INFO" doc:name="Logger" doc:id="a5d98a8e-cf9f-4cf9-ac4d-083e5afb9b61" message="st flow 1"/>
+		<ee:transform doc:name="Transform Message" doc:id="99a8a398-b6be-43a9-9b41-398b8289351b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"nawaz"++ null]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1839123d-bd8e-44ca-bbcd-7b0b63ac7497" message="end flow 1"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f0472ccb-d527-4ce8-878d-ac703bdf4012" >
+				<logger level="INFO" doc:name="Logger" doc:id="be1a5efb-1748-4428-883c-20bc9b057eba" />
+				<logger level="INFO" doc:name="Logger" doc:id="6c756e65-d87a-4adc-854e-27886949ab05" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="oecvsoep-newFlow2" doc:id="b8f776ad-83b3-4f39-a79d-55f05823152d" >
+		<logger level="INFO" doc:name="Logger" doc:id="339ab436-9c9c-4027-ad7a-1437966aab22" message="st flow 2"/>
+		<validation:is-null doc:id="80d013af-dcef-47bb-96cd-de869fa74ed6" value="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f971a64b-1d79-4a75-8846-c8aeaed8f7bc" message="end flow 2"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="709cf2d3-66c4-4c35-a6f4-d16f01914dfe" >
+				<logger level="INFO" doc:name="Logger" doc:id="ad6c0fdb-3e9c-45ab-800c-4c86a3dcef11" />
+				<logger level="INFO" doc:name="Logger" doc:id="fe4b49c7-2b3f-46d7-ad99-0e5b688c60ab" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
