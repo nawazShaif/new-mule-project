@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b3196771-3c79-41e7-9504-395078cec4f2" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="on-error-continueFlow" doc:id="63504b88-9957-49f6-bc88-a9c9c1f3ee4a" >
+		<http:listener doc:name="Listener" doc:id="2c5c1ec5-23ca-4ebf-ac0a-391f8783cf35" config-ref="HTTP_Listener_config" path="/test"/>
+		<logger level="INFO" doc:name="Logger" doc:id="569e738e-fb1f-47ae-be57-f15921f26d29" message="start flow"/>
+		<validation:is-null doc:id="983b9705-42b4-4f82-a565-2e7abedf02c9" value="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="80989fec-3d48-44f6-a065-16ffa49523b3" message="end flow"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d4e6bff5-dfe8-424e-b291-4d663dde809e" >
+				<ee:transform doc:name="Transform Message" doc:id="06145d1b-975c-4a6b-9471-e9128a65bec8" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"error": error.errorType]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7803dcb9-db1b-44f1-a33f-207b0f1c2676" />
+		</error-handler>
+	</flow>
+</mule>
